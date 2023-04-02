@@ -1,5 +1,17 @@
-# janky
+# Jank
 
-The world's jankiest ExpressJS webserver.
+Stays true to its name, likely the most jank ExpressJS web handler ever.
 
-Probably doesn't work in 9/10 use cases.
+# Features
+
+- Settings/Options
+- Routes
+- Error Handling
+- Method Validators
+- PORT Validators
+- Route Validators
+- Documentation
+
+# Documentation
+
+Documentation can be found on the [Wiki](https://github.com/znci/jank/wiki).
