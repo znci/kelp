@@ -85,6 +85,10 @@ kelp.settings = (settings) => {
           options.push("ejs");
           app.set("view engine", "ejs");
           break;
+        case "pug":
+          options.push("pug");
+          app.set("view engine", "pug");
+          break;
         case "public":
           options.push("public");
           app.use(express.static(path.join(__dirname, "public")));
