@@ -1,8 +1,8 @@
-# Jank
+# Kelp
 
-Stays true to its name, likely the most jank ExpressJS web handler ever.
+An easy to use, customizable ExpressJS web server.
 
-# Features
+## Features
 
 - Settings/Options
 - Routes
@@ -12,6 +12,6 @@ Stays true to its name, likely the most jank ExpressJS web handler ever.
 - Route Validators
 - Documentation
 
-# Documentation
+## Documentation
 
-Documentation can be found on the [Wiki](https://github.com/znci/jank/wiki).
+Documentation can be found on the [Wiki](https://github.com/znci/kelp/wiki).

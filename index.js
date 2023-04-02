@@ -1,14 +1,8 @@
-const { jank } = require("./jank");
+const { kelp } = require("./kelp");
 
-jank.settings({
-	PORT: 3193,
-	OPTIONS: [
-		"body-parser",
-		"ejs",
-		"public",
-		"cors",
-		"routes",
-	],
+kelp.settings({
+  PORT: 3193,
+  OPTIONS: ["body-parser", "ejs", "public", "cors", "routes"],
 });
 
-jank.listen();
+kelp.listen();

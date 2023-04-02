@@ -1,5 +1,5 @@
 VERSION="v1.0.0"
-NAME="jank"
+NAME="kelp"
 DESCRIPTION="An easy to use, customizable ExpressJS web server."
 
 PROJECT_LEAD="zNotChill"
