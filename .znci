@@ -2,6 +2,6 @@ VERSION="v1.0.0"
 NAME="jank"
 DESCRIPTION="An easy to use, customizable ExpressJS web server."
 
-PROJECT_LEAD="59340653"
-CONTRIBUTORS="zNotChill"
-INTERNAL_VERSION="1"
+PROJECT_LEAD="zNotChill"
+CONTRIBUTORS=["zNotChill"]
+INTERNAL_VERSION=1
