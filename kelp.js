@@ -170,7 +170,7 @@ kelp.listen = () => {
 
   app.listen(PORT, async () => {
     console.log(
-      `${colorPrim("Kelp")} ${colorSec("Listening on PORT")} ${colorPrim(PORT)}`
+      `${colorPrim("KELP")} ${colorSec("Listening on PORT")} ${colorPrim(PORT)}`
     );
 
     options.OPTIONS.forEach((v) => {
