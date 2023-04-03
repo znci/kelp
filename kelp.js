@@ -10,6 +10,8 @@ let options,
   routes = [];
 let PORT;
 let kelp = {};
+let uptime = 0;
+let startup = Date.now();
 
 /*
 	UTILS
@@ -146,6 +148,9 @@ kelp.readRoutes = (subdir) => {
       if (!routeData.method) return kelp.throwErr("INVALID_ROUTE");
       if (!kelp.isValidMethod(routeData.method))
         return kelp.throwErr("INVALID_ROUTE");
+      
+      if(options.IS_DEV_MODE && routeData.flags.devRoute) return;
+      if(routeData.flags.disabled) return; 
 
       app.all(routeData.path, (req, res) => {
         if (req.method === routeData.method) {
@@ -172,7 +177,22 @@ kelp.readRoutes = (subdir) => {
 kelp.listen = () => {
   const { colorPrim, colorSec, spaces } = kelp;
 
+  app.all("/heartbeat", (req, res) => {
+    if(req.method === "GET") {
+      res.status(200).json({
+        uptime: uptime,
+        startup: startup,
+        status: "OK",
+      })
+    } else {
+      res.status(405).send("The method <b>GET</b> is not allowed for this route.")
+    }
+  })
+
   app.listen(PORT, async () => {
+    setInterval(() => {
+      uptime++;
+    }, 1000);
     console.log(
       `${colorPrim("KELP")} ${colorSec("Listening on PORT")} ${colorPrim(PORT)}`
     );

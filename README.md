@@ -11,6 +11,8 @@ An easy to use, customizable ExpressJS web server.
 - PORT Validators
 - Route Validators
 - Documentation
+- Disabled Routes
+- Dev Mode Routes (can be disabled)
 
 ## Documentation
 
