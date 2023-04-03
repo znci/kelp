@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/znci/kelp.git"
   },
-  "author": "",
+  "author": "znci",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/znci/kelp/issues"
