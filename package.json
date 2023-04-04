@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/znci/kelp#readme",
   "dependencies": {
+    "@znci/kelp": "^0.0.1",
     "body-parser": "^1.20.2",
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
@@ -26,7 +27,7 @@
   "devDependencies": {
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
-    "nodemon": "^2.0.12",
-	"node-fetch": "^2.6.9"
+    "node-fetch": "^2.6.9",
+    "nodemon": "^2.0.12"
   }
 }
