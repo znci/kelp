@@ -17,6 +17,10 @@ let startup = Date.now();
 	UTILS
 */
 
+kelp.log = (m) => {
+  console.log(`${kelp.colorPrim("KELP")} ${m}`);
+}
+
 kelp.throwErr = (e) => {
   const errors = [
     {
@@ -163,13 +167,7 @@ kelp.readRoutes = (subdir) => {
             );
         }
       });
-      console.log(
-        `${colorPrim(spaces(4))} ${colorSec("Using method")} ${colorPrim(
-          routeData.method
-        )} ${colorSec("route")} ${colorPrim(routeData.path)} in ${colorPrim(
-          routePath.replace(__dirname, "")
-        )}`
-      );
+      kelp.log(`${colorSec("Using method")} ${colorPrim(routeData.method)} ${colorSec("route")} ${colorPrim(routeData.path)} in ${colorPrim(routePath.replace(__dirname, ""))}}`)
     }
   });
 };
@@ -177,36 +175,41 @@ kelp.readRoutes = (subdir) => {
 kelp.listen = () => {
   const { colorPrim, colorSec, spaces } = kelp;
 
-  app.all("/heartbeat", (req, res) => {
-    if (req.method === "GET") {
-      res.status(200).json({
-        uptime: uptime,
-        startup: startup,
-        status: "OK"
-      });
-    } else {
-      res
-        .status(405)
-        .send("The method <b>GET</b> is not allowed for this route.");
-    }
-  });
-
   app.listen(PORT, async () => {
     setInterval(() => {
       uptime++;
     }, 1000);
-    console.log(
-      `${colorPrim("KELP")} ${colorSec("Listening on PORT")} ${colorPrim(PORT)}`
-    );
+    kelp.log(`${colorSec("Listening on PORT")} ${colorPrim(PORT)}`)
 
     options.OPTIONS.forEach((v) => {
-      console.log(
-        `${colorPrim(spaces(4))} ${colorSec("Using")} ${colorPrim(v)}`
-      );
+      kelp.log(`${kelp.colorSec("Using")} ${kelp.colorPrim(v)}`)
     });
 
     if (options.OPTIONS.includes("routes")) {
       kelp.readRoutes("");
+    }
+
+      
+    // Register heartbeat
+
+    const heartbeat = options.HEARTBEAT && options.HEARTBEAT.ROUTE;
+    if(heartbeat) {
+      if(options.HEARTBEAT.FLAGS && options.HEARTBEAT.FLAGS.disabled) return;
+
+      kelp.log(`${colorSec("Heartbeat route")} ${colorPrim("enabled")} ${colorSec("and")} ${colorPrim("activated")} ${colorSec("on route")} ${colorPrim(options.HEARTBEAT.ROUTE)}`);
+      app.all(options.HEARTBEAT.ROUTE, (req, res) => {
+        if (req.method === "GET") {
+          res.status(200).json({
+            uptime: uptime,
+            startup: startup,
+            status: "OK"
+          });
+        } else {
+          res
+            .status(405)
+            .send("The method <b>GET</b> is not allowed for this route.");
+        }
+      });
     }
   });
 };
