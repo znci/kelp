@@ -9,7 +9,7 @@ function prep(filePath, callback) {
         reject();
       }
       const modifiedData = data.replace(/console\.log\(.*\);?\n?/g, "");
-      fs.writeFile("kelp.test.js", modifiedData, (err) => {
+      fs.writeFile("temp.test.js", modifiedData, (err) => {
         if (err) {
           console.error(err);
           reject();

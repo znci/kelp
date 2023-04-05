@@ -1,2 +1,11 @@
-node_modules/
-kelp.test.js
+# Test Files
+temp.test.js
+
+# Private znci files
+.znci.Private
+
+# TypeScript Files
+out/
+# TS -incremental file
+tsconfig.tsbuildinfo
+node_modules
