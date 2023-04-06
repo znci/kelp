@@ -28,7 +28,7 @@ class Kelp extends Object {
 		*/
 
 	  app: Express.Application;
-	  options: (set: KelpOptions) => KelpOptions;
+	  options: KelpOptions;
 	  routes: never[];
 	  colorPrim: (m: string) => string;
 	  colorSec: (m: string) => string;
@@ -42,9 +42,29 @@ class Kelp extends Object {
 
 	  constructor(set: KelpOptions) {
 		super();	
+		/* Properties */
 		this.app = app;
-		this.options = (set): KelpOptions => {
-			if (set.PORT) {
+		this.options = set;
+		this.colorPrim = chalk.hex("#99ffd8").bold;
+		this.colorSec = chalk.hex("#3dffb5");
+		this.spaces = (s) => {
+			return ` `.repeat(parseInt(s));
+		};
+		/* Utils */
+		this.validatePort = (port) => {
+			const PORT = parseInt(port);
+			if (PORT >= 0 && PORT <= 65535 && PORT) {
+				return true;
+			}
+			return false;
+		};
+		this.log = (m) => {
+			console.log(`${this.colorPrim("KELP")} ${m}`);
+		};
+		this.routes = [];
+
+		/* User Options */
+		if (set.PORT) {
 				if (!this.validatePort(String(set.PORT))) throw new InvalidPortError(`${set.PORT} is not a valid port.`);
 				PORT = set.PORT;
 			}
@@ -83,25 +103,7 @@ class Kelp extends Object {
 				});
 
 			}
-			return set;
-		};
 
-		this.colorPrim = chalk.hex("#99ffd8").bold;
-		this.colorSec = chalk.hex("#3dffb5");
-		this.spaces = (s) => {
-			return ` `.repeat(parseInt(s));
-		};
-		this.validatePort = (port) => {
-			const PORT = parseInt(port);
-			if (PORT >= 0 && PORT <= 65535 && PORT) {
-				return true;
-			}
-			return false;
-		};
-		this.log = (m) => {
-			console.log(`${this.colorPrim("KELP")} ${m}`);
-		};
-		this.routes = [];
 	  }
 
 		/*
@@ -139,7 +141,7 @@ class Kelp extends Object {
 				if (!this.isValidMethod(routeData.method))
 					throw new InvalidRouteError(`Route ${routePath} has an invalid method.`);
 
-				if (this.options.IS_DEV_MODE && routeData.flags.devRoute) return;
+				if (this.options && routeData.flags.devRoute) return;
 				if (routeData.flags.disabled) return;
 
 				app.all(routeData.path, (req, res) => {
@@ -164,11 +166,11 @@ class Kelp extends Object {
 				}, 1000);
 				this.log(`${this.colorSec("Listening on PORT")} ${this.colorPrim(PORT)}`)
 
-				this.options.OPTIONS.forEach((v) => {
+				this.options.OPTIONS?.forEach((v) => {
 				this.log(`${this.colorSec("Using")} ${this.colorPrim(v)}`)
 				});
 
-				if (this.options.OPTIONS.includes("routes")) {
+				if (this.options.OPTIONS?.includes("routes")) {
 				this.readRoutes("");
 				}
 
@@ -177,10 +179,10 @@ class Kelp extends Object {
 
 				const heartbeat = this.options.HEARTBEAT && this.options.HEARTBEAT.ROUTE;
 				if(heartbeat) {
-				if(this.options.HEARTBEAT.FLAGS && this.options.HEARTBEAT.FLAGS.disabled) return;
+				if(this.options.HEARTBEAT?.FLAGS && this.options.HEARTBEAT.FLAGS.disabled) return;
 
-				this.log(`${this.colorSec("Heartbeat route")} ${this.colorPrim("enabled")} ${this.colorSec("and")} ${this.colorPrim("activated")} ${this.colorSec("on route")} ${this.colorPrim(options.HEARTBEAT.ROUTE)}`);
-				app.all(this.options.HEARTBEAT.ROUTE, (req, res) => {
+				this.log(`${this.colorSec("Heartbeat route")} ${this.colorPrim("enabled")} ${this.colorSec("and")} ${this.colorPrim("activated")} ${this.colorSec("on route")} ${this.colorPrim(this.options.HEARTBEAT!.ROUTE)}`);
+				app.all(this.options.HEARTBEAT!.ROUTE, (req, res) => {
 					if (req.method === "GET") {
 					res.status(200).json({
 						uptime: uptime,

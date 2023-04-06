@@ -4,7 +4,8 @@
   "description": "An easy to use, customizable ExpressJS web server.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+	"publish": "npm publish --access public"
   },
   "repository": {
     "type": "git",
