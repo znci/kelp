@@ -20,6 +20,7 @@
     "forceConsistentCasingInFileNames": true,
     "allowUnreachableCode": true,
      "useUnknownInCatchVariables": false,  // TypeScript 4.4+ only!
+	"declaration": true
 },
   "include": [
     "src/**/*.ts"

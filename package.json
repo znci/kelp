@@ -1,11 +1,13 @@
 {
   "name": "@znci/kelp",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "An easy to use, customizable ExpressJS web server.",
-  "main": "index.js",
+  "main": "out/index.js",
+  "types": "out/index.d.ts",
   "scripts": {
     "test": "mocha",
-	"publish": "npm publish --access public"
+	"publish": "npm publish --access public",
+	"build": "tsc -b -v"
   },
   "repository": {
     "type": "git",
