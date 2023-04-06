@@ -35,6 +35,7 @@ class Kelp extends Object {
 	  spaces: (s: string) => string;
 	  validatePort: (port: string) => boolean;
 	  log: (m: string) => void;
+	  dirname__: string;
 
 		/*
 		CONSTRUCTOR
@@ -62,8 +63,10 @@ class Kelp extends Object {
 			console.log(`${this.colorPrim("KELP")} ${m}`);
 		};
 		this.routes = [];
+		this.dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
 
 		/* User Options */
+		let dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
 		if (set.PORT) {
 				if (!this.validatePort(String(set.PORT))) throw new InvalidPortError(`${set.PORT} is not a valid port.`);
 				PORT = set.PORT;
@@ -91,7 +94,7 @@ class Kelp extends Object {
 						break;
 						case "public":
 						useroptions.push("public");
-						app.use(express.static(path.join(__dirname, "public")));
+						app.use(express.static(path.join(dirname__, "public")));
 						break;
 						case "routes":
 						useroptions.push("routes");
@@ -111,7 +114,7 @@ class Kelp extends Object {
 		*/
 	  isValidRoute(route: string) {
 		fs.readFile(
-			path.join(__dirname, "routes", `${route}.js`),
+			path.join(this.dirname__, "routes", `${route}.js`),
 			"utf-8",
 			(err, data) => {
 				if (err) return false;
@@ -126,14 +129,17 @@ class Kelp extends Object {
 			return false;
 		};
 		readRoutes(subdir: string) {
-			let files = fs.readdirSync(path.join(__dirname, "routes", subdir));
+			let dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
+			let files = fs.readdirSync(path.join(dirname__, "routes", subdir));
 			files.forEach((file) => {
-				let stat = fs.lstatSync(path.join(__dirname, "routes", subdir, file));
+				let stat = fs.lstatSync(path.join(dirname__, "routes", subdir, file));
 				if (stat.isDirectory()) {
 				this.readRoutes(path.join(file));
 				} else {
 				let route = file.split(".")[0];
-				let routePath = path.join(__dirname, "routes", subdir, route);
+				// create the path but remove the node_modules/@znci/kelp/out part
+				let routePath = path.join(dirname__, "routes", subdir, route);
+				
 
 				let routeData = require(routePath);
 
@@ -155,7 +161,7 @@ class Kelp extends Object {
 						);
 					}
 				});
-				this.log(`${this.colorSec("Using method")} ${this.colorPrim(routeData.method)} ${this.colorSec("route")} ${this.colorPrim(routeData.path)} in ${this.colorPrim(routePath.replace(__dirname, ""))}}`)
+				this.log(`${this.colorSec("Using method")} ${this.colorPrim(routeData.method)} ${this.colorSec("route")} ${this.colorPrim(routeData.path)} in ${this.colorPrim(routePath.replace(dirname__, ""))}}`)
 				}
 			});
 		};
