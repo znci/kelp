@@ -1,6 +1,6 @@
 {
   "name": "@znci/kelp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An easy to use, customizable ExpressJS web server.",
   "main": "out/index.js",
   "types": "out/index.d.ts",
