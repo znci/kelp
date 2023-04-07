@@ -1,6 +1,6 @@
 {
   "name": "@znci/kelp",
-  "version": "0.0.1",
+  "version": "1.1.0",
   "description": "An easy to use, customizable ExpressJS web server.",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/znci/kelp.git"
   },
   "author": "znci",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/znci/kelp/issues"
   },
