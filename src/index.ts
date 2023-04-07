@@ -12,6 +12,7 @@ import fs from "fs";
 // Types, Errors, Interfaces
 import { InvalidPortError, InvalidRouteError } from "./lib/errors";
 import { KelpOptions } from "./types/MainTypes";
+import { UserOptions } from "./types/OptionsTypes";
 
 
 // Global Constants
@@ -29,13 +30,16 @@ class Kelp extends Object {
 
 	  app: Express.Application;
 	  options: KelpOptions;
-	  routes: never[];
+	  routes: any[];
 	  colorPrim: (m: string) => string;
 	  colorSec: (m: string) => string;
 	  spaces: (s: string) => string;
 	  validatePort: (port: string) => boolean;
 	  log: (m: string) => void;
 	  dirname__: string;
+	  useroptions: UserOptions;
+	  readRoutes: (subdir: string) => void;
+	  isValidMethod: (method: any) => boolean;
 
 		/*
 		CONSTRUCTOR
@@ -46,6 +50,7 @@ class Kelp extends Object {
 		/* Properties */
 		this.app = app;
 		this.options = set;
+		this.useroptions = set.OPTIONS!;
 		this.colorPrim = chalk.hex("#99ffd8").bold;
 		this.colorSec = chalk.hex("#3dffb5");
 		this.spaces = (s) => {
@@ -64,71 +69,13 @@ class Kelp extends Object {
 		};
 		this.routes = [];
 		this.dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
-
-		/* User Options */
-		let dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
-		if (set.PORT) {
-				if (!this.validatePort(String(set.PORT))) throw new InvalidPortError(`${set.PORT} is not a valid port.`);
-				PORT = set.PORT;
-			}
-			if (set.OPTIONS) {
-				let useroptions : string[] = [];
-				set.OPTIONS.forEach((v) => {
-					switch (v) {
-						case "body-parser":
-						useroptions.push("body-parser");
-						app.use(bodyParser.urlencoded({ extended: true }));
-						app.use(bodyParser.json());
-						break;
-						case "cors":
-						useroptions.push("cors");
-						app.use(cors());
-						break;
-						case "ejs":
-						useroptions.push("ejs");
-						app.set("view engine", "ejs");
-						break;
-						case "pug":
-						useroptions.push("pug");
-						app.set("view engine", "pug");
-						break;
-						case "public":
-						useroptions.push("public");
-						app.use(express.static(path.join(dirname__, "public")));
-						break;
-						case "routes":
-						useroptions.push("routes");
-
-						default:
-						break;
-					}
-					set.OPTIONS = useroptions;
-				});
-
-			}
-
-	  }
-
-		/*
-		METHODS
-		*/
-	  isValidRoute(route: string) {
-		fs.readFile(
-			path.join(this.dirname__, "routes", `${route}.js`),
-			"utf-8",
-			(err, data) => {
-				if (err) return false;
-				return true;
-			}
-		);
-		}  
-		isValidMethod(method: string) {
+		this.isValidMethod = (method) => {
 			const methods = ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"];
 
 			if (methods.includes(method)) return true;
 			return false;
 		};
-		readRoutes(subdir: string) {
+		this.readRoutes = (subdir) => {
 			let dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
 			let files = fs.readdirSync(path.join(dirname__, "routes", subdir));
 			files.forEach((file) => {
@@ -165,48 +112,102 @@ class Kelp extends Object {
 				}
 			});
 		};
+		/* User Options */
+		let dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
+		if (set.PORT) {
+			if (!this.validatePort(String(set.PORT))) throw new InvalidPortError(`${set.PORT} is not a valid port.`);
+			PORT = set.PORT;
+		}
+		if (set.OPTIONS) {
+			if (set.OPTIONS.cors) {
+				app.use(cors());
+			}
+			if (set.OPTIONS.bodyParser) {
+				app.use(bodyParser.json());
+				app.use(bodyParser.urlencoded({ extended: true }));
+			}
+			if (set.HEARTBEAT) {
+				app.all(set.HEARTBEAT.ROUTE, (req, res) => {
+					res.send("OK");
+				});
+			}
+			if (set.OPTIONS.public) {
+				app.use(express.static(path.join(dirname__, set.OPTIONS.publicOptions!.path!)));
+			}
+			if (set.OPTIONS.routes) {
+				this.readRoutes(path.join(dirname__, set.OPTIONS.routeOptions!.path!));
+			}
+			if (set.OPTIONS.custom) {
+				app.use(set.OPTIONS.customMiddleware!.middleware!);
+			}
+			if (set.OPTIONS.welcome) {
+				app.all("/", (req, res) => {
+					res.send(`
+					<!DOCTYPE html>
+						<html>
+
+						<head>
+							<title>Welcome to kelp!</title>
+							<style>
+								@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+								html {
+									color-scheme: light dark;
+								}
+
+								body {
+									width: 35em;
+									margin: 0 auto;
+									font-family: 'Inter', 'Comic Sans MS', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
+								}
+								/* weight 900 h1 */
+								h1 {
+									font-weight: 700;
+									font-size: 2.5em;
+									margin: 0.67em 0;
+								}
+								
+							</style>
+						</head>
+
+						<body>
+							<h1>Welcome to kelp!</h1>
+							<p>If you see this page, kelp is properly configured and is working as it should.</p>
+
+							<p>For online documentation and support please refer to
+								<a href="http://docs.znci.dev/kelp">docs.znci.dev</a>.<br />
+							</p>
+
+							<p><em>Thank you for using kelp!</em></p>
+						</body>
+
+						</html>
+					`)
+				})
+			}
+			if (set.OPTIONS.ejs) {
+				app.set("view engine", "ejs");
+				app.set("views", path.join(dirname__, set.OPTIONS.ejsOptions!.path!));
+			}
+			if (set.OPTIONS.pug) {
+				app.set("view engine", "pug");
+				app.set("views", path.join(dirname__, set.OPTIONS.pugOptions!.path!));
+			}
+		}
+	}
+
+		/**
+		 * Listen for oncoming requests.
+		 * Doesn't require any parameters.
+		 */
 		listen() {
 			app.listen(PORT, async () => {
 				setInterval(() => {
 				uptime++;
 				}, 1000);
 				this.log(`${this.colorSec("Listening on PORT")} ${this.colorPrim(PORT)}`)
-
-				this.options.OPTIONS?.forEach((v) => {
-				this.log(`${this.colorSec("Using")} ${this.colorPrim(v)}`)
-				});
-
-				if (this.options.OPTIONS?.includes("routes")) {
-				this.readRoutes("");
-				}
-
-				
-				// Register heartbeat
-
-				const heartbeat = this.options.HEARTBEAT && this.options.HEARTBEAT.ROUTE;
-				if(heartbeat) {
-				if(this.options.HEARTBEAT?.FLAGS && this.options.HEARTBEAT.FLAGS.disabled) return;
-
-				this.log(`${this.colorSec("Heartbeat route")} ${this.colorPrim("enabled")} ${this.colorSec("and")} ${this.colorPrim("activated")} ${this.colorSec("on route")} ${this.colorPrim(this.options.HEARTBEAT!.ROUTE)}`);
-				app.all(this.options.HEARTBEAT!.ROUTE, (req, res) => {
-					if (req.method === "GET") {
-					res.status(200).json({
-						uptime: uptime,
-						startup: startup,
-						status: "OK"
-					});
-					} else {
-					res
-						.status(405)
-						.send("The method <b>GET</b> is not allowed for this route.");
-					}
-				});
-				}
 			});
-		};
-		
-}
-
+		}
+	}
 
 
 

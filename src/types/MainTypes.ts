@@ -2,6 +2,8 @@
 	Kelp Types
 */
 
+import { UserOptions } from "./OptionsTypes";
+
 interface Heartbeat {
 	ROUTE: string;
 	FLAGS?: {
@@ -11,7 +13,7 @@ interface Heartbeat {
 
 export type KelpOptions = {
 	PORT?: number;
-	OPTIONS?: string[];
+	OPTIONS?: UserOptions;
 	IS_DEV_MODE?: boolean;
 	HEARTBEAT?: Heartbeat;
 };
