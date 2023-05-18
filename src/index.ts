@@ -16,10 +16,10 @@ import { UserOptions } from "./types/OptionsTypes";
 
 
 // Global Constants
-let app = express();
+const app = express();
 let PORT;
 let uptime = 0;
-let startup = Date.now();
+const startup = Date.now();
 
 
 class Kelp extends Object {
@@ -76,19 +76,19 @@ class Kelp extends Object {
 			return false;
 		};
 		this.readRoutes = (subdir) => {
-			let dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
-			let files = fs.readdirSync(path.join(dirname__, "routes", subdir));
+			const dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
+			const files = fs.readdirSync(path.join(dirname__, "routes", subdir));
 			files.forEach((file) => {
-				let stat = fs.lstatSync(path.join(dirname__, "routes", subdir, file));
+				const stat = fs.lstatSync(path.join(dirname__, "routes", subdir, file));
 				if (stat.isDirectory()) {
 				this.readRoutes(path.join(file));
 				} else {
-				let route = file.split(".")[0];
+				const route = file.split(".")[0];
 				// create the path but remove the node_modules/@znci/kelp/out part
-				let routePath = path.join(dirname__, "routes", subdir, route);
+				const routePath = path.join(dirname__, "routes", subdir, route);
 				
 
-				let routeData = require(routePath);
+				const routeData = require(routePath);
 
 				if (!routeData.method) throw new InvalidRouteError(`Route ${routePath} does not have a method.`);
 				if (!this.isValidMethod(routeData.method))
@@ -113,7 +113,7 @@ class Kelp extends Object {
 			});
 		};
 		/* User Options */
-		let dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
+		const dirname__ = __dirname.replace("node_modules/@znci/kelp/out", "");
 		if (set.PORT) {
 			if (!this.validatePort(String(set.PORT))) throw new InvalidPortError(`${set.PORT} is not a valid port.`);
 			PORT = set.PORT;
