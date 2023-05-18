@@ -29,7 +29,7 @@ export type PublicOptions = {
  */
 export type CustomMiddleware = {
   enabled?: boolean;
-  middleware?: (req: any, res: any) => void;
+  middleware?: (req: Express.Request, res: Express.Response) => void;
 };
 
 /**
