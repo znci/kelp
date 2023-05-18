@@ -1,5 +1,7 @@
 # Kelp
 
+[![CodeFactor](https://www.codefactor.io/repository/github/znci/kelp/badge/main)](https://www.codefactor.io/repository/github/znci/kelp/overview/main)
+
 An easy to use, customizable ExpressJS web server.
 
 ## Features
