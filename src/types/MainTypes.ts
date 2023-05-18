@@ -21,7 +21,7 @@ export type KelpOptions = {
 export type KelpRoute = {
   path: string;
   method: string;
-  handler: (req: any, res: any) => void;
+  handler: (req: Express.Request, res: Express.Response) => void;
   flags?: {
     disabled?: boolean;
     devRoute?: boolean;
