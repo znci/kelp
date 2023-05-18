@@ -17,8 +17,6 @@ import { UserOptions } from "./types/OptionsTypes";
 // Global Constants
 const app = express();
 let PORT;
-let uptime = 0;
-const startup = Date.now();
 
 class Kelp extends Object {
   /*
@@ -27,7 +25,7 @@ class Kelp extends Object {
 
   app: Express.Application;
   options: KelpOptions;
-  routes: any[];
+  routes: object[];
   colorPrim: (m: string) => string;
   colorSec: (m: string) => string;
   spaces: (s: string) => string;
@@ -36,7 +34,7 @@ class Kelp extends Object {
   dirname__: string;
   useroptions: UserOptions;
   readRoutes: (subdir: string) => void;
-  isValidMethod: (method: any) => boolean;
+  isValidMethod: (method: string) => boolean;
 
   /*
 		CONSTRUCTOR
@@ -219,9 +217,6 @@ class Kelp extends Object {
    */
   listen() {
     app.listen(PORT, async () => {
-      setInterval(() => {
-        uptime++;
-      }, 1000);
       this.log(`${this.colorSec("Listening on PORT")} ${this.colorPrim(PORT)}`);
     });
   }
