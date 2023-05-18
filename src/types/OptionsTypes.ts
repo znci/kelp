@@ -8,10 +8,9 @@
  * @param path The path to the route
  */
 export type RouteOptions = {
-	enabled?: boolean;
-	path?: string;
+  enabled?: boolean;
+  path?: string;
 };
-
 
 /**
  * Public Options
@@ -19,8 +18,8 @@ export type RouteOptions = {
  * @param path The path to the public folder
  */
 export type PublicOptions = {
-	enabled?: boolean;
-	path?: string;
+  enabled?: boolean;
+  path?: string;
 };
 
 /**
@@ -29,8 +28,8 @@ export type PublicOptions = {
  * @param middleware The middleware function
  */
 export type CustomMiddleware = {
-	enabled?: boolean;
-	middleware?: (req: any, res: any) => void;
+  enabled?: boolean;
+  middleware?: (req: any, res: any) => void;
 };
 
 /**
@@ -38,7 +37,7 @@ export type CustomMiddleware = {
  * @param path Path to the view engine routes folder
  */
 export type viewEngineOptions = {
-	path?: string;
+  path?: string;
 };
 
 /**
@@ -58,22 +57,17 @@ export type viewEngineOptions = {
  * @param publicOptions Options for the public folder
  */
 export type UserOptions = {
-	bodyParser?: boolean;
-	cors?: boolean;
-	ejs?: boolean;
-	ejsOptions?: viewEngineOptions;
-	pug?: boolean;
-	pugOptions?: viewEngineOptions;
-	welcome?: boolean;
-	routes?: boolean;
-	routeOptions?: RouteOptions;
-	custom?: boolean;
-	customMiddleware?: CustomMiddleware;
-	public?: boolean;
-	publicOptions?: PublicOptions;
+  bodyParser?: boolean;
+  cors?: boolean;
+  ejs?: boolean;
+  ejsOptions?: viewEngineOptions;
+  pug?: boolean;
+  pugOptions?: viewEngineOptions;
+  welcome?: boolean;
+  routes?: boolean;
+  routeOptions?: RouteOptions;
+  custom?: boolean;
+  customMiddleware?: CustomMiddleware;
+  public?: boolean;
+  publicOptions?: PublicOptions;
 };
-
-
-
-
-

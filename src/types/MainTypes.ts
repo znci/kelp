@@ -5,26 +5,25 @@
 import { UserOptions } from "./OptionsTypes";
 
 interface Heartbeat {
-	ROUTE: string;
-	FLAGS?: {
-		disabled?: boolean;
-	};
-};
+  ROUTE: string;
+  FLAGS?: {
+    disabled?: boolean;
+  };
+}
 
 export type KelpOptions = {
-	PORT?: number;
-	OPTIONS?: UserOptions;
-	IS_DEV_MODE?: boolean;
-	HEARTBEAT?: Heartbeat;
+  PORT?: number;
+  OPTIONS?: UserOptions;
+  IS_DEV_MODE?: boolean;
+  HEARTBEAT?: Heartbeat;
 };
 
 export type KelpRoute = {
-	path: string;
-	method: string;
-	handler: (req: any, res: any) => void;
-	flags?: {
-		disabled?: boolean;
-		devRoute?: boolean;
-	};
+  path: string;
+  method: string;
+  handler: (req: any, res: any) => void;
+  flags?: {
+    disabled?: boolean;
+    devRoute?: boolean;
+  };
 };
-
