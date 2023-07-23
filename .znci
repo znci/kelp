@@ -1,7 +1,0 @@
-VERSION="v1.0.0"
-NAME="kelp"
-DESCRIPTION="An easy to use, customizable ExpressJS web server."
-
-PROJECT_LEAD="zNotChill"
-CONTRIBUTORS=["zNotChill"]
-INTERNAL_VERSION=1
