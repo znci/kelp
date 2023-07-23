@@ -98,8 +98,6 @@ export default async function kelpify(app, options = {}) {
         errorHandler: "function",
         methodNotAllowedHandler: "function",
         middlewareCheckpoints: "object",
-        corsEnabled: "boolean",
-        corsOptions: "object",
         port: "number",
         environment: "string",
         autostart: "boolean",
@@ -294,7 +292,7 @@ export default async function kelpify(app, options = {}) {
 
               this.options.environment === "development"
                 ? this.warn(
-                    `405: ${req.method} ${req.path} (expected ${method}))`
+                    `405: ${req.method} ${req.path} (expected ${method})`
                   )
                 : null;
             }
