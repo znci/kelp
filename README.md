@@ -20,6 +20,8 @@ An easy to use, customizable ExpressJS web server.
 
 ## Basic Usage
 
+Install the package: `npm i @znci/kelp`
+
 ```js
 import express from "express";
 import kelpify from "@znci/kelp";
