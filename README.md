@@ -20,6 +20,8 @@ An easy to use, customizable ExpressJS web server.
 
 ## Basic Usage
 
+Install the package: `npm i @znci/kelp`
+
 ```js
 import express from "express";
 import kelpify from "@znci/kelp";
@@ -29,6 +31,8 @@ kelpify(app, {
   // options go here
 });
 ```
+
+Place your route files in the configured routes directory (`routes`) by default and follow the format under the *Routes* section.
 
 Kelp will automagically setup and serve your application on port 3000 by default (can be turned off).
 
@@ -45,6 +49,8 @@ Kelp will automagically setup and serve your application on port 3000 by default
 | `port`            | The port to serve your application on            | `3000`                  |                                                           | Int               |
 | `environment`     | The environment to run your application in       | `"development"`         | valid:   `"development", "production"`                    | String            |
 | `autostart`       | Whether or not to automatically start the server | `false`                 |                                                           | Boolean           |
+
+All options have default values, so none of them strictly need to be configured.
 
 ### What is the environment for?
 
