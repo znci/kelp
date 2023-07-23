@@ -1,6 +1,7 @@
 # Kelp
 
 [![CodeFactor](https://www.codefactor.io/repository/github/znci/kelp/badge/main)](https://www.codefactor.io/repository/github/znci/kelp/overview/main)
+[![npm version](https://badge.fury.io/js/@znci%2Fkelp.svg)](https://badge.fury.io/js/@znci%2Fkelp)
 
 An easy to use, customizable ExpressJS web server.
 
