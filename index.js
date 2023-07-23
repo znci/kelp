@@ -216,7 +216,14 @@ export default async function kelpify(app, options = {}) {
         developmentRoute: false,
         routeMiddleware: (req, res, next) => next(),
         handler: (req, res) => {
-          res.send("Hello world!");
+          res.send(
+            `
+              <h1>Route not Configured</h1>
+              <p>This route hasn't been configured yet! Make sure the route file has a handler set. If you do not administrate this website, please contact the owner.</p>
+              <hr />
+              <p>Powered by <a href="https://github.com/znci/kelp">znci/kelp</a></p>
+            `
+          );
         },
       };
 
@@ -325,6 +332,11 @@ export default async function kelpify(app, options = {}) {
       kelp.options.environment === "development"
     }).`
   );
+
+  kelp.app.use((req, res, next) => {
+    res.setHeader("X-Powered-By", "@znci/kelp");
+    next();
+  });
 
   kelp.registerMiddlewareAtCheckpoint("beforeRouteLoad");
 
