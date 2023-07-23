@@ -215,7 +215,7 @@ class Kelp {
         process.exit(1);
       }
 
-      if (!method in ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"]) {
+      if (!(method in ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"])) {
         this.error(
           new KelpException(
             `Invalid route: ${route}. Method must be one of the following: GET, HEAD, POST, PUT, PATCH, DELETE.`
