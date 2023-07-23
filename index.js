@@ -209,29 +209,44 @@ export default async function kelpify(app, options = {}) {
 
       await snakeDirectory(this.options.routesDirectory);
 
-      for (const route in routes) {
-        const {
-          method,
-          path,
-          disabled,
-          developmentRoute,
-          routeMiddleware,
-          handler,
-        } = routes[route];
+      const defaultOptions = {
+        method: "GET",
+        path: "/",
+        disabled: false,
+        developmentRoute: false,
+        routeMiddleware: (req, res, next) => next(),
+        handler: (req, res) => {
+          res.send("Hello world!");
+        },
+      };
 
-        if (
-          method === undefined ||
-          path === undefined ||
-          disabled === undefined ||
-          developmentRoute === undefined ||
-          handler === undefined
-        ) {
-          this.error(
-            new KelpException(
-              `Invalid route: ${route}. All routes must have a method, path, disabled, developmentRoute, and handler.`
-            )
-          );
-          process.exit(1);
+      const requiredTypes = {
+        method: "string",
+        path: "string",
+        disabled: "boolean",
+        developmentRoute: "boolean",
+        routeMiddleware: "function",
+        handler: "function",
+      };
+
+      for (const route in routes) {
+        const routeObject = routes[route];
+
+        for (const key in defaultOptions) {
+          if (routeObject[key] === undefined) {
+            routeObject[key] = defaultOptions[key];
+          }
+        }
+
+        for (const key in requiredTypes) {
+          if (typeof routeObject[key] !== requiredTypes[key]) {
+            this.error(
+              new KelpException(
+                `Invalid route: ${route}. ${key} must be of type ${requiredTypes[key]}.`
+              )
+            );
+            process.exit(1);
+          }
         }
 
         if (
@@ -245,7 +260,7 @@ export default async function kelpify(app, options = {}) {
             "OPTIONS",
             "TRACE",
             "PATCH",
-          ].includes(method)
+          ].includes(routeObject.method.toUpperCase())
         ) {
           this.error(
             new KelpException(
@@ -255,57 +270,39 @@ export default async function kelpify(app, options = {}) {
           process.exit(1);
         }
 
-        const requiredTypes = {
-          method: "string",
-          path: "string",
-          disabled: "boolean",
-          developmentRoute: "boolean",
-          // routeMiddleware: "function",         this is omitted from the check because it is optional. a check for this will come in a later release
-          handler: "function",
-        };
-
-        for (const key in requiredTypes) {
-          if (
-            typeof routes[route][key] !== requiredTypes[key] &&
-            key !== "routeMiddleware"
-          ) {
-            this.error(
-              new KelpException(
-                `Invalid route: ${route}. ${key} must be of type ${requiredTypes[key]}.`
-              )
-            );
-            process.exit(1);
-          }
-        }
-
         if (
-          ((this.options.environment === "development" && developmentRoute) ||
-            !developmentRoute) &&
-          !disabled
+          ((this.options.environment === "development" &&
+            routeObject.developmentRoute) ||
+            !routeObject.developmentRoute) &&
+          !routeObject.disabled
         ) {
           const routeHandler = (req, res) => {
-            if (req.method === method) {
-              handler(req, res);
+            if (req.method === routeObject.method.toUpperCase()) {
+              routeObject.handler(req, res);
             } else {
               this.options.methodNotAllowedHandler(req, res);
 
               this.options.environment === "development"
                 ? this.warn(
-                    `405: ${req.method} ${req.path} (expected ${method})`
+                    `405: ${req.method} ${req.path} (expected ${routeObject.method})`
                   )
                 : null;
             }
           };
 
-          routeMiddleware
-            ? this.app.all(path, routeMiddleware, (req, res) =>
-                routeHandler(req, res)
+          routeObject.routeMiddleware
+            ? this.app.all(
+                routeObject.path,
+                routeObject.routeMiddleware,
+                (req, res) => routeHandler(req, res)
               )
-            : this.app.all(path, (req, res) => routeHandler(req, res));
+            : this.app.all(routeObject.path, (req, res) =>
+                routeHandler(req, res)
+              );
 
-          this.info(`Loaded route: ${method} ${path}`);
+          this.info(`Loaded route: ${routeObject.method} ${routeObject.path}`);
         } else {
-          this.info(`Skipped route: ${method} ${path}`);
+          this.info(`Skipped route: ${routeObject.method} ${routeObject.path}`);
         }
       }
     },
