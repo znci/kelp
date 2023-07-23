@@ -1,2 +1,6 @@
 node_modules
 old
+routes
+views
+public
+app.js
