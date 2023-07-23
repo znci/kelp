@@ -32,6 +32,8 @@ kelpify(app, {
 });
 ```
 
+Place your route files in the configured routes directory (`routes`) by default and follow the format under the *Routes* section.
+
 Kelp will automagically setup and serve your application on port 3000 by default (can be turned off).
 
 ## Options
