@@ -46,6 +46,8 @@ Kelp will automagically setup and serve your application on port 3000 by default
 - environment - the environment to run your application in (default: `"development"`, valid: `"development", "production"`)
 - autostart - whether or not to automatically start the server (default: `true`)
 
+All options have default values, so none of them strictly need to be configured.
+
 ### What is the environment for?
 
 The environment option is used to determine whether or not to use development only routes and more verbose logging. If the environment is set to `"production"`, then development only routes will not be used and logging will be less verbose. If the environment is set to `"development"`, then development only routes will be used and logging will be more verbose.
