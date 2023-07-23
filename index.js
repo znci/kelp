@@ -78,8 +78,6 @@ export default async function kelpify(app, options = {}) {
           beforeServe: null,
           afterServe: null,
         },
-        corsEnabled: false,
-        corsOptions: {},
         port: 3000,
         environment: "development",
         autostart: true,
@@ -179,11 +177,6 @@ export default async function kelpify(app, options = {}) {
             );
             process.exit(1);
         }
-
-        if (this.options.corsEnabled) {
-          this.app.use(cors(this.options.corsOptions));
-        }
-
         for (const checkpoint in this.options.middlewareCheckpoints) {
           if (
             this.options.middlewareCheckpoints[checkpoint] !== null &&
@@ -339,12 +332,12 @@ export default async function kelpify(app, options = {}) {
     }).`
   );
 
-  this.registerMiddlewareAtCheckpoint("beforeRouteLoad");
+  kelp.registerMiddlewareAtCheckpoint("beforeRouteLoad");
 
   await kelp.loadRoutes();
 
-  this.registerMiddlewareAtCheckpoint("afterRouteLoad");
-  this.registerMiddlewareAtCheckpoint("beforeBuiltinMiddlewareRegister");
+  kelp.registerMiddlewareAtCheckpoint("afterRouteLoad");
+  kelp.registerMiddlewareAtCheckpoint("beforeBuiltinMiddlewareRegister");
 
   kelp.info("Loaded routes. Starting server...");
 
@@ -352,18 +345,18 @@ export default async function kelpify(app, options = {}) {
   kelp.app.use(express.urlencoded({ extended: true }));
   kelp.app.use(cookieParser());
 
-  this.registerMiddlewareAtCheckpoint("afterBuiltinMiddlewareRegister");
-  this.registerMiddlewareAtCheckpoint("before404Register");
+  kelp.registerMiddlewareAtCheckpoint("afterBuiltinMiddlewareRegister");
+  kelp.registerMiddlewareAtCheckpoint("before404Register");
 
   kelp.app.use(kelp.options.notFoundHandler);
 
-  this.registerMiddlewareAtCheckpoint("after404Register");
-  this.registerMiddlewareAtCheckpoint("beforeErrorRegister");
+  kelp.registerMiddlewareAtCheckpoint("after404Register");
+  kelp.registerMiddlewareAtCheckpoint("beforeErrorRegister");
 
   kelp.app.use(kelp.options.errorHandler);
 
-  this.registerMiddlewareAtCheckpoint("afterErrorRegister");
-  this.registerMiddlewareAtCheckpoint("beforeServe");
+  kelp.registerMiddlewareAtCheckpoint("afterErrorRegister");
+  kelp.registerMiddlewareAtCheckpoint("beforeServe");
 
   kelp.options.autostart
     ? kelp.start()
