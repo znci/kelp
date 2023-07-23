@@ -41,7 +41,7 @@ export default async function kelpify(app, options = {}) {
       consola.error(error);
     },
 
-    executeRouteMiddleware(checkpoint) {
+    registerMiddlewareAtCheckpoint(checkpoint) {
       this.options.middlewareCheckpoints[checkpoint]
         ? this.app.use(this.options.middlewareCheckpoints[checkpoint])
         : null;
@@ -339,12 +339,12 @@ export default async function kelpify(app, options = {}) {
     }).`
   );
 
-  this.executeRouteMiddleware("beforeRouteLoad");
+  this.registerMiddlewareAtCheckpoint("beforeRouteLoad");
 
   await kelp.loadRoutes();
 
-  this.executeRouteMiddleware("afterRouteLoad");
-  this.executeRouteMiddleware("beforeBuiltinMiddlewareRegister");
+  this.registerMiddlewareAtCheckpoint("afterRouteLoad");
+  this.registerMiddlewareAtCheckpoint("beforeBuiltinMiddlewareRegister");
 
   kelp.info("Loaded routes. Starting server...");
 
@@ -352,18 +352,18 @@ export default async function kelpify(app, options = {}) {
   kelp.app.use(express.urlencoded({ extended: true }));
   kelp.app.use(cookieParser());
 
-  this.executeRouteMiddleware("afterBuiltinMiddlewareRegister");
-  this.executeRouteMiddleware("before404Register");
+  this.registerMiddlewareAtCheckpoint("afterBuiltinMiddlewareRegister");
+  this.registerMiddlewareAtCheckpoint("before404Register");
 
   kelp.app.use(kelp.options.notFoundHandler);
 
-  this.executeRouteMiddleware("after404Register");
-  this.executeRouteMiddleware("beforeErrorRegister");
+  this.registerMiddlewareAtCheckpoint("after404Register");
+  this.registerMiddlewareAtCheckpoint("beforeErrorRegister");
 
   kelp.app.use(kelp.options.errorHandler);
 
-  this.executeRouteMiddleware("afterErrorRegister");
-  this.executeRouteMiddleware("beforeServe");
+  this.registerMiddlewareAtCheckpoint("afterErrorRegister");
+  this.registerMiddlewareAtCheckpoint("beforeServe");
 
   kelp.options.autostart
     ? kelp.start()
