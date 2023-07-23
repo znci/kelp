@@ -34,15 +34,17 @@ Kelp will automagically setup and serve your application on port 3000 by default
 
 ## Options
 
-- routesDirectory - the directory to look for routes in (default: `__dirname + "/routes"`)
-- publicDirectory - the directory to serve static files from (default: `__dirname + "/public"`)
-- viewsDirectory - the directory to look for views in (default: `__dirname + "/views"`)
-- viewEngine - the view engine to use (default: `"none"`, valid: `"none", "ejs", "pug", "nunjucks", "handlebars"`)
-- notFoundHandler - the middleware function to use for 404 errors
-- errorHandler - the middleware function to use for errors
-- port - the port to serve your application on (default: `3000`)
-- environment - the environment to run your application in (default: `"development"`, valid: `"development", "production"`)
-- autostart - whether or not to automatically start the server (default: `true`)
+| Option            | Description                                      | Default                 | Extra                                                     | Type              |
+|-------------------|--------------------------------------------------|-------------------------|-----------------------------------------------------------|-------------------|
+| `routesDirectory` | The directory to look for routes in              | `__dirname + "/routes"` |                                                           | String            |
+| `publicDirectory` | The directory to serve static files from         | `__dirname + "/public"` |                                                           | String            |
+| `viewsDirectory`  | The directory to look for views in               | `__dirname + "/views"`  |                                                           | String            |
+| `viewEngine`      | The view engine to use                           | `"none"`                | valid:   `"none", "ejs", "pug", "nunjucks", "handlebars"` | String            |
+| `notFoundHandler` | The middleware function to use for 404 errors    |                         | Not set by default.                                       | Callback Function |
+| `errorHandler`    | The middleware function to use for errors        |                         | Not set by default.                                       | Callback Function |
+| `port`            | The port to serve your application on            | `3000`                  |                                                           | Int               |
+| `environment`     | The environment to run your application in       | `"development"`         | valid:   `"development", "production"`                    | String            |
+| `autostart`       | Whether or not to automatically start the server | `false`                 |                                                           | Boolean           |
 
 ### What is the environment for?
 
