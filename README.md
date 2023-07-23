@@ -116,4 +116,4 @@ There must be only be 1 route per file. Route paths do not strictly have to matc
 
 ## Documentation
 
-Full documentation for Kelp will be coming soon. (@zNotChill is responsible)
+Full documentation for Kelp will be coming soon.
