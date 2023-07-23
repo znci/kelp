@@ -32,23 +32,23 @@ kelpify(app, {
 });
 ```
 
-Place your route files in the configured routes directory (`routes`) by default and follow the format under the *Routes* section.
+Place your route files in the configured routes directory (`routes`) by default and follow the format under the _Routes_ section.
 
 Kelp will automagically setup and serve your application on port 3000 by default (can be turned off).
 
 ## Options
 
-| Option            | Description                                      | Default                 | Extra                                                     | Type              |
-|-------------------|--------------------------------------------------|-------------------------|-----------------------------------------------------------|-------------------|
-| `routesDirectory` | The directory to look for routes in              | `__dirname + "/routes"` |                                                           | String            |
-| `publicDirectory` | The directory to serve static files from         | `__dirname + "/public"` |                                                           | String            |
-| `viewsDirectory`  | The directory to look for views in               | `__dirname + "/views"`  |                                                           | String            |
-| `viewEngine`      | The view engine to use                           | `"none"`                | valid:   `"none", "ejs", "pug", "nunjucks", "handlebars"` | String            |
-| `notFoundHandler` | The middleware function to use for 404 errors    |                         | Not set by default.                                       | Callback Function |
-| `errorHandler`    | The middleware function to use for errors        |                         | Not set by default.                                       | Callback Function |
-| `port`            | The port to serve your application on            | `3000`                  |                                                           | Int               |
-| `environment`     | The environment to run your application in       | `"development"`         | valid:   `"development", "production"`                    | String            |
-| `autostart`       | Whether or not to automatically start the server | `false`                 |                                                           | Boolean           |
+| Option            | Description                                      | Default                 | Extra                                                   | Type              |
+| ----------------- | ------------------------------------------------ | ----------------------- | ------------------------------------------------------- | ----------------- |
+| `routesDirectory` | The directory to look for routes in              | `__dirname + "/routes"` |                                                         | String            |
+| `publicDirectory` | The directory to serve static files from         | `__dirname + "/public"` |                                                         | String            |
+| `viewsDirectory`  | The directory to look for views in               | `__dirname + "/views"`  |                                                         | String            |
+| `viewEngine`      | The view engine to use                           | `"none"`                | valid: `"none", "ejs", "pug", "nunjucks", "handlebars"` | String            |
+| `notFoundHandler` | The middleware function to use for 404 errors    | Function                |                                                         | Callback Function |
+| `errorHandler`    | The middleware function to use for errors        | Function                |                                                         | Callback Function |
+| `port`            | The port to serve your application on            | `3000`                  |                                                         | Int               |
+| `environment`     | The environment to run your application in       | `"development"`         | valid: `"development", "production"`                    | String            |
+| `autostart`       | Whether or not to automatically start the server | `false`                 |                                                         | Boolean           |
 
 All options have default values, so none of them strictly need to be configured.
 
