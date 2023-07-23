@@ -2,7 +2,6 @@ import { consola } from "consola";
 import cookieParser from "cookie-parser";
 import express from "express";
 import fs from "node:fs";
-import cors from "cors";
 
 // view engines
 import nunjucks from "nunjucks";
