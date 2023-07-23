@@ -57,7 +57,9 @@ export default async function kelpify(app, options = {}) {
           res.status(500).send("Internal server error");
           this.error(error);
         },
-        methodNotAllowedHandler: (req, res) => {},
+        methodNotAllowedHandler: (req, res) => {
+          res.status(405).send("Method not allowed");
+        },
         corsEnabled: false,
         corsOptions: {},
         port: 3000,
@@ -187,8 +189,14 @@ export default async function kelpify(app, options = {}) {
       await snakeDirectory(this.options.routesDirectory);
 
       for (const route in routes) {
-        const { method, path, disabled, developmentRoute, handler } =
-          routes[route];
+        const {
+          method,
+          path,
+          disabled,
+          developmentRoute,
+          routeMiddleware,
+          handler,
+        } = routes[route];
 
         if (
           method === undefined ||
@@ -231,11 +239,15 @@ export default async function kelpify(app, options = {}) {
           path: "string",
           disabled: "boolean",
           developmentRoute: "boolean",
+          // routeMiddleware: "function",         this is omitted from the check because it is optional. a check for this will come in a later release
           handler: "function",
         };
 
         for (const key in requiredTypes) {
-          if (typeof routes[route][key] !== requiredTypes[key]) {
+          if (
+            typeof routes[route][key] !== requiredTypes[key] &&
+            key !== "routeMiddleware"
+          ) {
             this.error(
               new KelpException(
                 `Invalid route: ${route}. ${key} must be of type ${requiredTypes[key]}.`
@@ -250,18 +262,25 @@ export default async function kelpify(app, options = {}) {
             !developmentRoute) &&
           !disabled
         ) {
-          this.app.all(path, (req, res) => {
+          const routeHandler = (req, res) => {
             if (req.method === method) {
               handler(req, res);
             } else {
-              res.status(405).send("Method not allowed");
+              this.options.methodNotAllowedHandler(req, res);
+
               this.options.environment === "development"
                 ? this.warn(
                     `405: ${req.method} ${req.path} (expected ${method}))`
                   )
                 : null;
             }
-          });
+          };
+
+          routeMiddleware
+            ? this.app.all(path, routeMiddleware, (req, res) =>
+                routeHandler(req, res)
+              )
+            : this.app.all(path, (req, res) => routeHandler(req, res));
 
           this.info(`Loaded route: ${method} ${path}`);
         } else {
