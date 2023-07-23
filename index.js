@@ -40,6 +40,12 @@ export default async function kelpify(app, options = {}) {
       consola.error(error);
     },
 
+    registerMiddlewareAtCheckpoint(checkpoint) {
+      this.options.middlewareCheckpoints[checkpoint]
+        ? this.app.use(this.options.middlewareCheckpoints[checkpoint])
+        : null;
+    },
+
     loadOptions() {
       const defaultOptions = {
         routesDirectory: __dirname + "/routes",
@@ -56,12 +62,25 @@ export default async function kelpify(app, options = {}) {
           res.status(500).send("Internal server error");
           this.error(error);
         },
+        methodNotAllowedHandler: (req, res) => {
+          res.status(405).send("Method not allowed");
+        },
+        middlewareCheckpoints: {
+          beforeRouteLoad: null,
+          afterRouteLoad: null,
+          beforeBuiltinMiddlewareRegister: null,
+          afterBuiltinMiddlewareRegister: null,
+          before404Register: null,
+          after404Register: null,
+          beforeErrorRegister: null,
+          afterErrorRegister: null,
+          beforeServe: null,
+          afterServe: null,
+        },
         port: 3000,
         environment: "development",
         autostart: true,
       };
-
-      console.log(this.options);
 
       for (const key in defaultOptions) {
         if (this.options[key] === undefined) {
@@ -76,6 +95,8 @@ export default async function kelpify(app, options = {}) {
         viewEngine: "string",
         notFoundHandler: "function",
         errorHandler: "function",
+        methodNotAllowedHandler: "function",
+        middlewareCheckpoints: "object",
         port: "number",
         environment: "string",
         autostart: "boolean",
@@ -153,6 +174,19 @@ export default async function kelpify(app, options = {}) {
             );
             process.exit(1);
         }
+        for (const checkpoint in this.options.middlewareCheckpoints) {
+          if (
+            this.options.middlewareCheckpoints[checkpoint] !== null &&
+            typeof this.options.middlewareCheckpoints[checkpoint] !== "function"
+          ) {
+            this.error(
+              new KelpException(
+                `Invalid middleware checkpoint: ${checkpoint}. ${checkpoint} must be a function.`
+              )
+            );
+            process.exit(1);
+          }
+        }
       }
     },
 
@@ -176,8 +210,14 @@ export default async function kelpify(app, options = {}) {
       await snakeDirectory(this.options.routesDirectory);
 
       for (const route in routes) {
-        const { method, path, disabled, developmentRoute, handler } =
-          routes[route];
+        const {
+          method,
+          path,
+          disabled,
+          developmentRoute,
+          routeMiddleware,
+          handler,
+        } = routes[route];
 
         if (
           method === undefined ||
@@ -220,11 +260,15 @@ export default async function kelpify(app, options = {}) {
           path: "string",
           disabled: "boolean",
           developmentRoute: "boolean",
+          // routeMiddleware: "function",         this is omitted from the check because it is optional. a check for this will come in a later release
           handler: "function",
         };
 
         for (const key in requiredTypes) {
-          if (typeof routes[route][key] !== requiredTypes[key]) {
+          if (
+            typeof routes[route][key] !== requiredTypes[key] &&
+            key !== "routeMiddleware"
+          ) {
             this.error(
               new KelpException(
                 `Invalid route: ${route}. ${key} must be of type ${requiredTypes[key]}.`
@@ -239,18 +283,25 @@ export default async function kelpify(app, options = {}) {
             !developmentRoute) &&
           !disabled
         ) {
-          this.app.all(path, (req, res) => {
+          const routeHandler = (req, res) => {
             if (req.method === method) {
               handler(req, res);
             } else {
-              res.status(405).send("Method not allowed");
+              this.options.methodNotAllowedHandler(req, res);
+
               this.options.environment === "development"
                 ? this.warn(
-                    `405: ${req.method} ${req.path} (expected ${method}))`
+                    `405: ${req.method} ${req.path} (expected ${method})`
                   )
                 : null;
             }
-          });
+          };
+
+          routeMiddleware
+            ? this.app.all(path, routeMiddleware, (req, res) =>
+                routeHandler(req, res)
+              )
+            : this.app.all(path, (req, res) => routeHandler(req, res));
 
           this.info(`Loaded route: ${method} ${path}`);
         } else {
@@ -278,7 +329,12 @@ export default async function kelpify(app, options = {}) {
     }).`
   );
 
+  kelp.registerMiddlewareAtCheckpoint("beforeRouteLoad");
+
   await kelp.loadRoutes();
+
+  kelp.registerMiddlewareAtCheckpoint("afterRouteLoad");
+  kelp.registerMiddlewareAtCheckpoint("beforeBuiltinMiddlewareRegister");
 
   kelp.info("Loaded routes. Starting server...");
 
@@ -286,8 +342,18 @@ export default async function kelpify(app, options = {}) {
   kelp.app.use(express.urlencoded({ extended: true }));
   kelp.app.use(cookieParser());
 
+  kelp.registerMiddlewareAtCheckpoint("afterBuiltinMiddlewareRegister");
+  kelp.registerMiddlewareAtCheckpoint("before404Register");
+
   kelp.app.use(kelp.options.notFoundHandler);
+
+  kelp.registerMiddlewareAtCheckpoint("after404Register");
+  kelp.registerMiddlewareAtCheckpoint("beforeErrorRegister");
+
   kelp.app.use(kelp.options.errorHandler);
+
+  kelp.registerMiddlewareAtCheckpoint("afterErrorRegister");
+  kelp.registerMiddlewareAtCheckpoint("beforeServe");
 
   kelp.options.autostart
     ? kelp.start()
