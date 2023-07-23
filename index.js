@@ -2,6 +2,7 @@ import { consola } from "consola";
 import cookieParser from "cookie-parser";
 import express from "express";
 import fs from "node:fs";
+import cors from "cors";
 
 // view engines
 import nunjucks from "nunjucks";
@@ -56,6 +57,9 @@ export default async function kelpify(app, options = {}) {
           res.status(500).send("Internal server error");
           this.error(error);
         },
+        methodNotAllowedHandler: (req, res) => {},
+        corsEnabled: false,
+        corsOptions: {},
         port: 3000,
         environment: "development",
         autostart: true,
@@ -76,6 +80,9 @@ export default async function kelpify(app, options = {}) {
         viewEngine: "string",
         notFoundHandler: "function",
         errorHandler: "function",
+        methodNotAllowedHandler: "function",
+        corsEnabled: "boolean",
+        corsOptions: "object",
         port: "number",
         environment: "string",
         autostart: "boolean",
@@ -152,6 +159,10 @@ export default async function kelpify(app, options = {}) {
               )
             );
             process.exit(1);
+        }
+
+        if (this.options.corsEnabled) {
+          this.app.use(cors(this.options.corsOptions));
         }
       }
     },
