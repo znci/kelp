@@ -60,14 +60,24 @@ export default async function kelpify(app, options = {}) {
         methodNotAllowedHandler: (req, res) => {
           res.status(405).send("Method not allowed");
         },
+        middlewareCheckpoints: {
+          beforeRouteLoad: null,
+          afterRouteLoad: null,
+          beforeBuiltinMiddlewareRegister: null,
+          afterBuiltinMiddlewareRegister: null,
+          before404Register: null,
+          after404Register: null,
+          beforeErrorRegister: null,
+          afterErrorRegister: null,
+          beforeServe: null,
+          afterServe: null,
+        },
         corsEnabled: false,
         corsOptions: {},
         port: 3000,
         environment: "development",
         autostart: true,
       };
-
-      console.log(this.options);
 
       for (const key in defaultOptions) {
         if (this.options[key] === undefined) {
@@ -83,6 +93,7 @@ export default async function kelpify(app, options = {}) {
         notFoundHandler: "function",
         errorHandler: "function",
         methodNotAllowedHandler: "function",
+        middlewareCheckpoints: "object",
         corsEnabled: "boolean",
         corsOptions: "object",
         port: "number",
@@ -165,6 +176,20 @@ export default async function kelpify(app, options = {}) {
 
         if (this.options.corsEnabled) {
           this.app.use(cors(this.options.corsOptions));
+        }
+
+        for (const checkpoint in this.options.middlewareCheckpoints) {
+          if (
+            this.options.middlewareCheckpoints[checkpoint] !== null &&
+            typeof this.options.middlewareCheckpoints[checkpoint] !== "function"
+          ) {
+            this.error(
+              new KelpException(
+                `Invalid middleware checkpoint: ${checkpoint}. ${checkpoint} must be a function.`
+              )
+            );
+            process.exit(1);
+          }
         }
       }
     },
@@ -308,16 +333,53 @@ export default async function kelpify(app, options = {}) {
     }).`
   );
 
+  this.options.middlewareCheckpoints.beforeRouteLoad
+    ? this.options.middlewareCheckpoints.beforeRouteLoad()
+    : null;
+
   await kelp.loadRoutes();
 
+  this.options.middlewareCheckpoints.afterRouteLoad
+    ? this.options.middlewareCheckpoints.afterRouteLoad()
+    : null;
+
   kelp.info("Loaded routes. Starting server...");
+
+  this.options.middlewareCheckpoints.beforeBuiltinMiddlewareRegister
+    ? this.options.middlewareCheckpoints.beforeBuiltinMiddlewareRegister()
+    : null;
 
   kelp.app.use(express.json());
   kelp.app.use(express.urlencoded({ extended: true }));
   kelp.app.use(cookieParser());
 
+  this.options.middlewareCheckpoints.afterBuiltinMiddlewareRegister
+    ? this.options.middlewareCheckpoints.afterBuiltinMiddlewareRegister()
+    : null;
+
+  this.options.middlewareCheckpoints.before404Register
+    ? this.options.middlewareCheckpoints.before404Register()
+    : null;
+
   kelp.app.use(kelp.options.notFoundHandler);
+
+  this.options.middlewareCheckpoints.after404Register
+    ? this.options.middlewareCheckpoints.after404Register()
+    : null;
+
+  this.options.middlewareCheckpoints.beforeErrorRegister
+    ? this.options.middlewareCheckpoints.beforeErrorRegister()
+    : null;
+
   kelp.app.use(kelp.options.errorHandler);
+
+  this.options.middlewareCheckpoints.afterErrorRegister
+    ? this.options.middlewareCheckpoints.afterErrorRegister()
+    : null;
+
+  this.options.middlewareCheckpoints.beforeServe
+    ? this.options.middlewareCheckpoints.beforeServe()
+    : null;
 
   kelp.options.autostart
     ? kelp.start()
