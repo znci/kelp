@@ -53,17 +53,39 @@ export default async function kelpify(app, options = {}) {
         viewsDirectory: __dirname + "/views",
         viewEngine: "none",
         notFoundHandler: (req, res) => {
-          res.status(404).send("Not found");
+          res.status(404).send(
+            `
+              <h1>404 - Not Found</h1>
+              <p>This route could not be found on the server. Please double-check your URL and path route option (if you are a webmaster).</p>
+              <hr />
+              <p>Powered by <a href="https://github.com/znci/kelp">znci/kelp</a></p>
+            `
+          );
+
           this.options.environment === "development"
             ? this.warn(`404: ${req.method} ${req.path}`)
             : null;
         },
         errorHandler: (error, req, res, next) => {
-          res.status(500).send("Internal server error");
+          res.status(500).send(
+            `
+              <h1>500 - Internal Server Error</h1>
+              <p>While processing your request, the server encountered an error. This is likely an issue with the application. Please see your server console for more information.</p>
+              <hr />
+              <p>Powered by <a href="https://github.com/znci/kelp">znci/kelp</a></p>
+            `
+          );
           this.error(error);
         },
         methodNotAllowedHandler: (req, res) => {
-          res.status(405).send("Method not allowed");
+          res.status(405).send(
+            `
+              <h1>405 - Method not Allowed</h1>
+              <p>This route is not configured to receive requests with the method of your request.</p>
+              <hr />
+              <p>Powered by <a href="https://github.com/znci/kelp">znci/kelp</a></p>
+            `
+          );
         },
         middlewareCheckpoints: {
           beforeRouteLoad: null,
