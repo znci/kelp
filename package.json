@@ -1,5 +1,5 @@
 {
-  "name": "kelp",
+  "name": "@znci/kelp",
   "version": "2.0.0-alpha",
   "description": "An easy to use, customizable ExpressJS web server.",
   "main": "index.js",
