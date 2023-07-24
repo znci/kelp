@@ -1,0 +1,7 @@
+VERSION="v3.1.1"
+NAME="kelp"
+DESCRIPTION="An easy to use, customizable ExpressJS web server."
+
+PROJECT_LEAD=["zNotChill", "blockarchitech"]
+CONTRIBUTORS=["zNotChill", "cerq", "blockarchitech", "unium"]
+INTERNAL_VERSION=1
