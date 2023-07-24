@@ -66,7 +66,7 @@ export default async function kelpify(app, options = {}) {
             ? this.warn(`404: ${req.method} ${req.path}`)
             : null;
         },
-        errorHandler: (error, req, res, next) => {
+        errorHandler: (err, req, res, next) => {
           res.status(500).send(
             `
               <h1>500 - Internal Server Error</h1>
@@ -75,6 +75,7 @@ export default async function kelpify(app, options = {}) {
               <p>Powered by <a href="https://github.com/znci/kelp">znci/kelp</a></p>
             `
           );
+
           this.error(error);
         },
         methodNotAllowedHandler: (req, res) => {
@@ -97,7 +98,6 @@ export default async function kelpify(app, options = {}) {
           beforeErrorRegister: null,
           afterErrorRegister: null,
           beforeServe: null,
-          afterServe: null,
         },
         port: 3000,
         environment: "development",
