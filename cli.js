@@ -37,7 +37,7 @@ if (command === "generate") {
 
   const routeTemplate = `export default {
   method: "${method}",
-  path: "${path}",
+  path: "/${path}",
 
   handler: async (req, res) => {
     res.send("Hello World!");
