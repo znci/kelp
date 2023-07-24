@@ -12,8 +12,7 @@ An easy to use, customizable ExpressJS web server.
 - Disabled routes
 - Development only routes
 - Static file serving
-- Automatic `express.json` and `express.urlencoded` middleware
-- Automatic cookie parser middleware
+- Automatic `bodyParser.json`, `bodyParser.urlencoded`, and `cookieParser` middlewaresetup
 - Logging
 - Customizable 404 handler
 - Customizable error handler
