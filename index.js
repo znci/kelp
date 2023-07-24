@@ -8,10 +8,7 @@ import nunjucks from "nunjucks";
 import { engine } from "express-handlebars";
 
 // __dirname recreation
-import { fileURLToPath } from "node:url";
-import { dirname } from "node:path";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = process.cwd();
 
 class KelpException extends Error {
   constructor(message) {
