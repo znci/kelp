@@ -57,8 +57,6 @@ export default async function kelpify(app, options = {}) {
             `
               <h1>404 - Not Found</h1>
               <p>This route could not be found on the server. Please double-check your URL and path route option (if you are a webmaster).</p>
-              <hr />
-              <p>Powered by <a href="https://github.com/znci/kelp">znci/kelp</a></p>
             `
           );
 
@@ -75,8 +73,6 @@ export default async function kelpify(app, options = {}) {
             `
               <h1>500 - Internal Server Error</h1>
               <p>While processing your request, the server encountered an error. This is likely an issue with the application. Please see your server console for more information.</p>
-              <hr />
-              <p>Powered by <a href="https://github.com/znci/kelp">znci/kelp</a></p>
             `
           );
 
@@ -87,8 +83,6 @@ export default async function kelpify(app, options = {}) {
             `
               <h1>405 - Method not Allowed</h1>
               <p>This route is not configured to receive requests with the method of your request.</p>
-              <hr />
-              <p>Powered by <a href="https://github.com/znci/kelp">znci/kelp</a></p>
             `
           );
         },
@@ -248,8 +242,6 @@ export default async function kelpify(app, options = {}) {
             `
               <h1>Route not Configured</h1>
               <p>This route hasn't been configured yet! Make sure the route file has a handler set. If you do not administrate this website, please contact the owner.</p>
-              <hr />
-              <p>Powered by <a href="https://github.com/znci/kelp">znci/kelp</a></p>
             `
           );
         },
@@ -368,7 +360,7 @@ export default async function kelpify(app, options = {}) {
       header.toLowerCase() !== "X-Powered-By".toLowerCase()
         ? res.setHeader(header, kelp.options.alwaysAddedHeaders[header])
         : kelp.warn(
-            "The X-Powered-By header cannot be overriden. The least we ask is that we receive some credit for those who are technichally skilled via this header. znci/kelp and all znci projects are open source and we have no means of advertising or getting ourselves out there. If you really want to disable or modify this header, you can modify the module code manually. We ask that you share this project with anybody in the tech community who may be interested in it. Thank you."
+            "The X-Powered-By header cannot be overriden."
           );
     }
 
