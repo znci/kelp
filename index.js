@@ -2,6 +2,7 @@ import { consola } from "consola";
 import cookieParser from "cookie-parser";
 import express from "express";
 import fs from "node:fs";
+import bodyParser from "body-parser";
 
 // view engines
 import nunjucks from "nunjucks";
@@ -335,8 +336,8 @@ export default async function kelpify(app, options = {}) {
 
   kelp.info("Loaded routes. Starting server...");
 
-  kelp.app.use(express.json());
-  kelp.app.use(express.urlencoded({ extended: true }));
+  kelp.app.use(bodyParser.json());
+  kelp.app.use(bodyParser.urlencoded({ extended: true }));
   kelp.app.use(cookieParser());
 
   kelp.registerMiddlewareAtCheckpoint("afterBuiltinMiddlewareRegister");

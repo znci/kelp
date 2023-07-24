@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/znci/kelp#readme",
   "dependencies": {
+    "body-parser": "^1.20.2",
     "consola": "^3.2.3",
     "cookie-parser": "^1.4.6",
     "ejs": "^3.1.9",
