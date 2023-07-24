@@ -103,6 +103,7 @@ export default async function kelpify(app, options = {}) {
           afterErrorRegister: null,
           beforeServe: null,
         },
+        alwaysAddedHeaders: {},
         port: 3000,
         environment: "development",
         autostart: true,
@@ -123,6 +124,7 @@ export default async function kelpify(app, options = {}) {
         errorHandler: "function",
         methodNotAllowedHandler: "function",
         middlewareCheckpoints: "object",
+        alwaysAddedHeaders: "object",
         port: "number",
         environment: "string",
         autostart: "boolean",
@@ -361,6 +363,15 @@ export default async function kelpify(app, options = {}) {
 
   kelp.app.use((req, res, next) => {
     res.setHeader("X-Powered-By", "@znci/kelp");
+
+    for (const header in kelp.options.alwaysAddedHeaders) {
+      header.toLowerCase() !== "X-Powered-By".toLowerCase()
+        ? res.setHeader(header, kelp.options.alwaysAddedHeaders[header])
+        : kelp.warn(
+            "The X-Powered-By header cannot be overriden. The least we ask is that we receive some credit for those who are technichally skilled via this header. znci/kelp and all znci projects are open source and we have no means of advertising or getting ourselves out there. If you really want to disable or modify this header, you can modify the module code manually. We ask that you share this project with anybody in the tech community who may be interested in it. Thank you."
+          );
+    }
+
     next();
   });
 
