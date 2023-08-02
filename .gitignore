@@ -4,3 +4,4 @@ routes
 views
 public
 app.js
+.DS_Store
