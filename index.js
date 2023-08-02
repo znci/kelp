@@ -112,7 +112,7 @@ export default async function kelpify(app, options = {}) {
             `
           );
 
-          this.error(error);
+          this.error(err);
         },
         methodNotAllowedHandler: (req, res) => {
           res.status(405).send(
