@@ -43,7 +43,7 @@ class KelpException extends Error {
  * @param {number} options.port The port to run the server on.
  * @param {string} options.environment The environment to run the server in.
  * @param {boolean} options.autostart Whether or not to automatically start the server.
- * 
+ *
  * @param {function} options.middlewareCheckpoints.beforeRouteLoad The function to run before routes are loaded.
  * @param {function} options.middlewareCheckpoints.afterRouteLoad The function to run after routes are loaded.
  * @param {function} options.middlewareCheckpoints.beforeBuiltinMiddlewareRegister The function to run before built-in middleware is registered.
@@ -431,5 +431,3 @@ export default async function kelpify(app, options = {}) {
     ? kelp.start()
     : kelp.info("Kelp has finished initializing. Autostart is disabled.");
 }
-
-kelpify();
