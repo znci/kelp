@@ -2,6 +2,7 @@ import { consola } from "consola";
 import cookieParser from "cookie-parser";
 import express from "express";
 import fs from "node:fs";
+import path from "node:path";
 import bodyParser from "body-parser";
 
 // view engines
@@ -248,24 +249,41 @@ export default async function kelpify(app, options = {}) {
       }
     },
 
-    async loadRoutes() {
-      let routes = [];
+    /**
+     * Recursively searches a directory for files and returns an array of file paths.
+     * @param directory The directory to search.
+     * @param arrayOfFiles An optional array of file paths to append to.
+     * @returns An array of file paths.
+     */
 
-      async function snakeDirectory(directory) {
-        const files = fs.readdirSync(directory);
+    async snakeDirectory(directory, arrayOfFiles) {
+      const files = fs.readdirSync(directory);
 
-        for (const file of files) {
-          const path = directory + "/" + file;
+      arrayOfFiles = arrayOfFiles || [];
 
-          if (fs.statSync(path).isDirectory()) {
-            await snakeDirectory(path);
-          } else {
-            routes.push((await import(path)).default);
-          }
+      files.forEach(function (file) {
+        if (fs.statSync(directory + "/" + file).isDirectory()) {
+          arrayOfFiles = this.snakeDirectory(
+            directory + "/" + file,
+            arrayOfFiles
+          );
+        } else {
+          arrayOfFiles.push(path.join(__dirname, directory, "/", file));
         }
-      }
+      });
 
-      await snakeDirectory(this.options.routesDirectory);
+      return arrayOfFiles;
+    },
+
+    async loadRoutes() {
+      const routes = [];
+
+      const files = await this.snakeDirectory(this.options.routesDirectory);
+
+      for (const file of files) {
+        const loadedFile = await import(file);
+        routes.push(loadedFile.default);
+      }
 
       const defaultOptions = {
         method: "GET",
