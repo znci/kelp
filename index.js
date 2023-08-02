@@ -35,24 +35,24 @@ class KelpException extends Error {
  * @param {string} options.publicDirectory The directory where the static files are stored.
  * @param {string} options.viewsDirectory The directory where the views are stored.
  * @param {string} options.viewEngine The view engine to use. If you do not want to use a view engine, set this to "none".
- * @param {function} options.notFoundHandler The function to run when a route is not found.
- * @param {function} options.errorHandler The function to run when an error occurs.
- * @param {function} options.methodNotAllowedHandler The function to run when a method is not allowed.
+ * @param {function} options.notFoundHandler The middleware to register when a route is not found.
+ * @param {function} options.errorHandler The middleware to register when an error occurs.
+ * @param {function} options.methodNotAllowedHandler The middleware to register when a method is not allowed.
  * @param {object} options.middlewareCheckpoints The checkpoints where middleware should be registered.
  * @param {object} options.alwaysAddedHeaders The headers to add to every response.
  * @param {number} options.port The port to run the server on.
  * @param {string} options.environment The environment to run the server in.
  * @param {boolean} options.autostart Whether or not to automatically start the server.
  *
- * @param {function} options.middlewareCheckpoints.beforeRouteLoad The function to run before routes are loaded.
- * @param {function} options.middlewareCheckpoints.afterRouteLoad The function to run after routes are loaded.
- * @param {function} options.middlewareCheckpoints.beforeBuiltinMiddlewareRegister The function to run before built-in middleware is registered.
- * @param {function} options.middlewareCheckpoints.afterBuiltinMiddlewareRegister The function to run after built-in middleware is registered.
- * @param {function} options.middlewareCheckpoints.before404Register The function to run before the 404 handler is registered.
- * @param {function} options.middlewareCheckpoints.after404Register The function to run after the 404 handler is registered.
- * @param {function} options.middlewareCheckpoints.beforeErrorRegister The function to run before the error handler is registered.
- * @param {function} options.middlewareCheckpoints.afterErrorRegister The function to run after the error handler is registered.
- * @param {function} options.middlewareCheckpoints.beforeServe The function to run before the server is started.
+ * @param {function} options.middlewareCheckpoints.beforeRouteLoad The middleware to register before routes are loaded.
+ * @param {function} options.middlewareCheckpoints.afterRouteLoad The middleware to register after routes are loaded.
+ * @param {function} options.middlewareCheckpoints.beforeBuiltinMiddlewareRegister The middleware to register before built-in middleware is registered.
+ * @param {function} options.middlewareCheckpoints.afterBuiltinMiddlewareRegister The middleware to register after built-in middleware is registered.
+ * @param {function} options.middlewareCheckpoints.before404Register The middleware to register before the 404 handler is registered.
+ * @param {function} options.middlewareCheckpoints.after404Register The middleware to register after the 404 handler is registered.
+ * @param {function} options.middlewareCheckpoints.beforeErrorRegister The middleware to register before the error handler is registered.
+ * @param {function} options.middlewareCheckpoints.afterErrorRegister The middleware to register after the error handler is registered.
+ * @param {function} options.middlewareCheckpoints.beforeServe The middleware to register before the server is started.
  *
  * @returns {Promise<void>} A promise that resolves when the server is started.
  */
