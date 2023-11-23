@@ -106,17 +106,14 @@ export default async function kelpify(app, options = {}) {
         },
         errorHandler: (err, req, res, next) => {
           if (res.headersSent) {
-            return next(err);
+            return next(err)
           }
-
-          res.status(500).send(
-            `
-              <h1>500 - Internal Server Error</h1>
-              <p>While processing your request, the server encountered an error. This is likely an issue with the application. Please see your server console for more information.</p>
-            `
-          );
-
-          this.error(err);
+          res.status(500)
+          res.send(`
+            <h1>500 - Internal Server Error</h1>
+            <p>Crash and burn! Something went wrong.</p>
+            <p>${err}</p>
+          `)
         },
         methodNotAllowedHandler: (req, res) => {
           res.status(405).send(
