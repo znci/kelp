@@ -2,15 +2,26 @@ import { consola } from "consola";
 import cookieParser from "cookie-parser";
 import express from "express";
 import fs from "node:fs";
+import path from "node:path";
 import bodyParser from "body-parser";
 
 // view engines
 import nunjucks from "nunjucks";
 import { engine } from "express-handlebars";
 
-// __dirname recreation
-const __dirname = process.cwd();
+/**
+ * @constant __dirname
+ * @description The current working directory (according to `process.cwd()`)
+ */
+export const __dirname = process.cwd();
 
+/**
+ * @class KelpException
+ * @extends Error
+ * @description An exception thrown by Kelp.
+ * @param {string} message The error message.
+ * @returns {KelpException} The KelpException object.
+ */
 class KelpException extends Error {
   constructor(message) {
     super(message);
@@ -18,6 +29,37 @@ class KelpException extends Error {
   }
 }
 
+/**
+ * @function kelpify
+ * @description A function that adds on the Kelp framework to an Express app.
+ * @param {express.Application} app The Express app.
+ * @param {object} [options] The options for Kelp.
+ *
+ * @param {string} [options.routesDirectory=__dirname + "/routes"] The directory to load routes from.
+ * @param {string} [options.publicDirectory=__dirname + "/public"] The directory to serve static files from.
+ * @param {string} [options.viewsDirectory=__dirname + "/views"] The directory to load views from.
+ * @param {string} [options.viewEngine="none"] The view engine to use. If set to "none", no view engine will be used.
+ * @param {function} [options.notFoundHandler] The handler for 404 errors.
+ * @param {function} [options.errorHandler] The handler for 500 errors.
+ * @param {function} [options.methodNotAllowedHandler] The handler for 405 errors.
+ * @param {object} [options.middlewareCheckpoints] The checkpoints to register middleware at.
+ * @param {object} [options.alwaysAddedHeaders] The headers to add to every response.
+ * @param {number} [options.port=3000] The port to run the server on.
+ * @param {string} [options.environment="development"] The environment to run the server in.
+ * @param {boolean} [options.autostart=true] Whether to automatically start the server.
+ *
+ * @param {function} [options.middlewareCheckpoints.beforeRouteLoad] The checkpoint to register middleware before routes are loaded.
+ * @param {function} [options.middlewareCheckpoints.afterRouteLoad] The checkpoint to register middleware after routes are loaded.
+ * @param {function} [options.middlewareCheckpoints.beforeBuiltinMiddlewareRegister] The checkpoint to register middleware before built-in middleware is registered.
+ * @param {function} [options.middlewareCheckpoints.afterBuiltinMiddlewareRegister] The checkpoint to register middleware after built-in middleware is registered.
+ * @param {function} [options.middlewareCheckpoints.before404Register] The checkpoint to register middleware before the 404 handler is registered.
+ * @param {function} [options.middlewareCheckpoints.after404Register] The checkpoint to register middleware after the 404 handler is registered.
+ * @param {function} [options.middlewareCheckpoints.beforeErrorRegister] The checkpoint to register middleware before the error handler is registered.
+ * @param {function} [options.middlewareCheckpoints.afterErrorRegister] The checkpoint to register middleware after the error handler is registered.
+ * @param {function} [options.middlewareCheckpoints.beforeServe] The checkpoint to register middleware before the server is started.
+ *
+ * @returns {Promise<void>} A promise that resolves when the server is started.
+ */
 export default async function kelpify(app, options = {}) {
   const kelp = {
     app: app,
@@ -51,17 +93,35 @@ export default async function kelpify(app, options = {}) {
         viewsDirectory: __dirname + "/views",
         viewEngine: "none",
         notFoundHandler: (req, res) => {
-          res.status(404).send("Not found");
+          res.status(404).send(
+            `
+              <h1>404 - Not Found</h1>
+              <p>This route could not be found on the server. Please double-check your URL and path route option (if you are a webmaster).</p>
+            `
+          );
+
           this.options.environment === "development"
             ? this.warn(`404: ${req.method} ${req.path}`)
             : null;
         },
-        errorHandler: (error, req, res, next) => {
-          res.status(500).send("Internal server error");
-          this.error(error);
+        errorHandler: (err, req, res, next) => {
+          if (res.headersSent) {
+            return next(err)
+          }
+          res.status(500)
+          res.send(`
+            <h1>500 - Internal Server Error</h1>
+            <p>Crash and burn! Something went wrong.</p>
+            <p>${err}</p>
+          `)
         },
         methodNotAllowedHandler: (req, res) => {
-          res.status(405).send("Method not allowed");
+          res.status(405).send(
+            `
+              <h1>405 - Method not Allowed</h1>
+              <p>This route is not configured to receive requests with the method of your request.</p>
+            `
+          );
         },
         middlewareCheckpoints: {
           beforeRouteLoad: null,
@@ -73,8 +133,8 @@ export default async function kelpify(app, options = {}) {
           beforeErrorRegister: null,
           afterErrorRegister: null,
           beforeServe: null,
-          afterServe: null,
         },
+        alwaysAddedHeaders: {},
         port: 3000,
         environment: "development",
         autostart: true,
@@ -95,6 +155,7 @@ export default async function kelpify(app, options = {}) {
         errorHandler: "function",
         methodNotAllowedHandler: "function",
         middlewareCheckpoints: "object",
+        alwaysAddedHeaders: "object",
         port: "number",
         environment: "string",
         autostart: "boolean",
@@ -188,48 +249,85 @@ export default async function kelpify(app, options = {}) {
       }
     },
 
-    async loadRoutes() {
-      let routes = [];
+    /**
+     * Recursively searches a directory for files and returns an array of file paths.
+     * @param directory The directory to search.
+     * @param arrayOfFiles An optional array of file paths to append to.
+     * @returns An array of file paths.
+     */
 
-      async function snakeDirectory(directory) {
-        const files = fs.readdirSync(directory);
+    async snakeDirectory(directory, arrayOfFiles) {
+      const files = fs.readdirSync(directory);
 
-        for (const file of files) {
-          const path = directory + "/" + file;
+      arrayOfFiles = arrayOfFiles || [];
 
-          if (fs.statSync(path).isDirectory()) {
-            await snakeDirectory(path);
-          } else {
-            routes.push((await import(path)).default);
-          }
+      files.forEach(function (file) {
+        if (fs.statSync(directory + "/" + file).isDirectory()) {
+          arrayOfFiles = this.snakeDirectory(
+            directory + "/" + file,
+            arrayOfFiles
+          );
+        } else {
+          arrayOfFiles.push(path.join(__dirname, directory, "/", file));
         }
+      });
+
+      return arrayOfFiles;
+    },
+
+    async loadRoutes() {
+      const routes = [];
+
+      const files = await this.snakeDirectory(this.options.routesDirectory);
+
+      for (const file of files) {
+        const loadedFile = await import(file);
+        routes.push(loadedFile.default);
       }
 
-      await snakeDirectory(this.options.routesDirectory);
+      const defaultOptions = {
+        method: "GET",
+        path: "/",
+        disabled: false,
+        developmentRoute: false,
+        routeMiddleware: (req, res, next) => next(),
+        handler: (req, res) => {
+          res.send(
+            `
+              <h1>Route not Configured</h1>
+              <p>This route hasn't been configured yet! Make sure the route file has a handler set. If you do not administrate this website, please contact the owner.</p>
+            `
+          );
+        },
+      };
+
+      const requiredTypes = {
+        method: "string",
+        path: "string",
+        disabled: "boolean",
+        developmentRoute: "boolean",
+        routeMiddleware: "function",
+        handler: "function",
+      };
 
       for (const route in routes) {
-        const {
-          method,
-          path,
-          disabled,
-          developmentRoute,
-          routeMiddleware,
-          handler,
-        } = routes[route];
+        const routeObject = routes[route];
 
-        if (
-          method === undefined ||
-          path === undefined ||
-          disabled === undefined ||
-          developmentRoute === undefined ||
-          handler === undefined
-        ) {
-          this.error(
-            new KelpException(
-              `Invalid route: ${route}. All routes must have a method, path, disabled, developmentRoute, and handler.`
-            )
-          );
-          process.exit(1);
+        for (const key in defaultOptions) {
+          if (routeObject[key] === undefined) {
+            routeObject[key] = defaultOptions[key];
+          }
+        }
+
+        for (const key in requiredTypes) {
+          if (typeof routeObject[key] !== requiredTypes[key]) {
+            this.error(
+              new KelpException(
+                `Invalid route: ${route}. ${key} must be of type ${requiredTypes[key]}.`
+              )
+            );
+            process.exit(1);
+          }
         }
 
         if (
@@ -243,7 +341,7 @@ export default async function kelpify(app, options = {}) {
             "OPTIONS",
             "TRACE",
             "PATCH",
-          ].includes(method)
+          ].includes(routeObject.method.toUpperCase())
         ) {
           this.error(
             new KelpException(
@@ -253,57 +351,39 @@ export default async function kelpify(app, options = {}) {
           process.exit(1);
         }
 
-        const requiredTypes = {
-          method: "string",
-          path: "string",
-          disabled: "boolean",
-          developmentRoute: "boolean",
-          // routeMiddleware: "function",         this is omitted from the check because it is optional. a check for this will come in a later release
-          handler: "function",
-        };
-
-        for (const key in requiredTypes) {
-          if (
-            typeof routes[route][key] !== requiredTypes[key] &&
-            key !== "routeMiddleware"
-          ) {
-            this.error(
-              new KelpException(
-                `Invalid route: ${route}. ${key} must be of type ${requiredTypes[key]}.`
-              )
-            );
-            process.exit(1);
-          }
-        }
-
         if (
-          ((this.options.environment === "development" && developmentRoute) ||
-            !developmentRoute) &&
-          !disabled
+          ((this.options.environment === "development" &&
+            routeObject.developmentRoute) ||
+            !routeObject.developmentRoute) &&
+          !routeObject.disabled
         ) {
           const routeHandler = (req, res) => {
-            if (req.method === method) {
-              handler(req, res);
+            if (req.method === routeObject.method.toUpperCase()) {
+              routeObject.handler(req, res);
             } else {
               this.options.methodNotAllowedHandler(req, res);
 
               this.options.environment === "development"
                 ? this.warn(
-                    `405: ${req.method} ${req.path} (expected ${method})`
+                    `405: ${req.method} ${req.path} (expected ${routeObject.method})`
                   )
                 : null;
             }
           };
 
-          routeMiddleware
-            ? this.app.all(path, routeMiddleware, (req, res) =>
-                routeHandler(req, res)
+          routeObject.routeMiddleware
+            ? this.app.all(
+                routeObject.path,
+                routeObject.routeMiddleware,
+                (req, res) => routeHandler(req, res)
               )
-            : this.app.all(path, (req, res) => routeHandler(req, res));
+            : this.app.all(routeObject.path, (req, res) =>
+                routeHandler(req, res)
+              );
 
-          this.info(`Loaded route: ${method} ${path}`);
+          this.info(`Loaded route: ${routeObject.method} ${routeObject.path}`);
         } else {
-          this.info(`Skipped route: ${method} ${path}`);
+          this.info(`Skipped route: ${routeObject.method} ${routeObject.path}`);
         }
       }
     },
@@ -326,6 +406,18 @@ export default async function kelpify(app, options = {}) {
       kelp.options.environment === "development"
     }).`
   );
+
+  kelp.app.use((req, res, next) => {
+    res.setHeader("X-Powered-By", "@znci/kelp");
+
+    for (const header in kelp.options.alwaysAddedHeaders) {
+      header.toLowerCase() !== "X-Powered-By".toLowerCase()
+        ? res.setHeader(header, kelp.options.alwaysAddedHeaders[header])
+        : kelp.warn("The X-Powered-By header cannot be overriden.");
+    }
+
+    next();
+  });
 
   kelp.registerMiddlewareAtCheckpoint("beforeRouteLoad");
 

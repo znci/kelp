@@ -64,11 +64,14 @@ import express from "express";
 import kelpify from "@znci/kelp";
 
 const app = express();
-kelpify(app, {
-  autostart: false,
-}).then(() => {
+
+(async () => {
+  await kelpify(app, {
+    autostart: false,
+  });
+
   app.listen(3000);
-});
+})();
 ```
 
 **OR**
@@ -78,14 +81,11 @@ import express from "express";
 import kelpify from "@znci/kelp";
 
 const app = express();
-
-(async () => {
-  await kelpify(app, {
-    autostart: false,
-  });
-
+kelpify(app, {
+  autostart: false,
+}).then(() => {
   app.listen(3000);
-})();
+});
 ```
 
 ## Routes
