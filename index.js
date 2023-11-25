@@ -67,7 +67,7 @@ export default async function kelpify(app, options = {}) {
 
     info(message) {
       ((this || {}).options || { environment: "development" }).environment ===
-      "development"
+        "development"
         ? consola.info(`KELP: ${message}`)
         : null;
     },
@@ -108,12 +108,13 @@ export default async function kelpify(app, options = {}) {
           if (res.headersSent) {
             return next(err)
           }
-          res.status(500)
-          res.send(`
-            <h1>500 - Internal Server Error</h1>
-            <p>Crash and burn! Something went wrong.</p>
-            <p>${err}</p>
-          `)
+          res.status(500).send(
+            `
+              <h1>500 - Internal Server Error</h1>
+              <p>An internal server error occured. Please try again later.</p>
+            `
+          );
+          this.error(err);
         },
         methodNotAllowedHandler: (req, res) => {
           res.status(405).send(
@@ -365,21 +366,21 @@ export default async function kelpify(app, options = {}) {
 
               this.options.environment === "development"
                 ? this.warn(
-                    `405: ${req.method} ${req.path} (expected ${routeObject.method})`
-                  )
+                  `405: ${req.method} ${req.path} (expected ${routeObject.method})`
+                )
                 : null;
             }
           };
 
           routeObject.routeMiddleware
             ? this.app.all(
-                routeObject.path,
-                routeObject.routeMiddleware,
-                (req, res) => routeHandler(req, res)
-              )
+              routeObject.path,
+              routeObject.routeMiddleware,
+              (req, res) => routeHandler(req, res)
+            )
             : this.app.all(routeObject.path, (req, res) =>
-                routeHandler(req, res)
-              );
+              routeHandler(req, res)
+            );
 
           this.info(`Loaded route: ${routeObject.method} ${routeObject.path}`);
         } else {
@@ -402,22 +403,9 @@ export default async function kelpify(app, options = {}) {
   kelp.info("Initalized options. Loading routes...");
 
   kelp.info(
-    `Loading znci/kelp with environment ${kelp.options.environment.toUpperCase()} (dev enabled: ${
-      kelp.options.environment === "development"
+    `Loading znci/kelp with environment ${kelp.options.environment.toUpperCase()} (dev enabled: ${kelp.options.environment === "development"
     }).`
   );
-
-  kelp.app.use((req, res, next) => {
-    res.setHeader("X-Powered-By", "@znci/kelp");
-
-    for (const header in kelp.options.alwaysAddedHeaders) {
-      header.toLowerCase() !== "X-Powered-By".toLowerCase()
-        ? res.setHeader(header, kelp.options.alwaysAddedHeaders[header])
-        : kelp.warn("The X-Powered-By header cannot be overriden.");
-    }
-
-    next();
-  });
 
   kelp.registerMiddlewareAtCheckpoint("beforeRouteLoad");
 
