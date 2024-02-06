@@ -26,7 +26,7 @@
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-handlebars": "^7.1.0",
-    "meow": "^12.1.1",
+    "meow": "^13.2.0",
     "nunjucks": "^3.2.4",
     "pug": "^3.0.2",
     "yargs": "^17.7.2"
